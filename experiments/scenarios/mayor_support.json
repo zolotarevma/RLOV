@@ -1,0 +1,198 @@
+{
+  "title": "The Mayor's Support",
+  "description": "Convince the mayor to fund your expedition. His sick sister and outstanding tasks may hold the key.",
+  "initial_flags": {},
+  "beacons": [
+    {
+      "id": "village_start",
+      "type": "start",
+      "name": "The Mayor's Request",
+      "description": "Mayor Edric offers a reward for anyone who can rid the village of rats, but you need his funding for a greater expedition.",
+      "preconditions": {},
+      "effects": {"quest_received": true},
+      "narrative_effects": ["continue"],
+      "choices": ["info_gathering"]
+    },
+    {
+      "id": "info_gathering",
+      "type": "story",
+      "name": "The Village Tavern",
+      "description": "At the tavern, you overhear that the mayor's sister, Liara, is gravely ill. A merchant might have a cure, and the mayor has posted several small tasks.",
+      "preconditions": {"quest_received": true},
+      "effects": {"learned_about_liara": true, "learned_about_errands": true},
+      "narrative_effects": ["chose_help_liara", "chose_errands", "chose_approach_mayor"],
+      "choices": ["help_liara", "do_errands", "approach_mayor"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "help_liara",
+      "type": "story",
+      "name": "A Sister's Plight",
+      "description": "You decide to help Liara. The merchant Valdus has the medicine, but at a steep price. You might also persuade him or steal it.",
+      "preconditions": {"learned_about_liara": true, "liara_saved": false},
+      "effects": {},
+      "narrative_effects": ["chose_pay_gold", "chose_steal_medicine"],
+      "choices": ["pay_gold", "steal_medicine"],
+      "expected_player_flag": "chose_help_liara"
+    },
+    {
+      "id": "pay_gold",
+      "type": "story",
+      "name": "A Fair Trade",
+      "description": "You pay Valdus for the medicine. He hands it over, wishing Liara a swift recovery.",
+      "preconditions": {},
+      "effects": {"got_medicine": true, "paid_gold": true},
+      "narrative_effects": ["continue"],
+      "choices": ["give_medicine"],
+      "expected_player_flag": "chose_pay_gold"
+    },
+    {
+      "id": "steal_medicine",
+      "type": "story",
+      "name": "A Risky Theft",
+      "description": "You manage to steal the medicine, but Valdus spots you. He vows to report you to the mayor.",
+      "preconditions": {},
+      "effects": {"got_medicine": true, "angered_merchant": true},
+      "narrative_effects": ["continue"],
+      "choices": ["give_medicine"],
+      "expected_player_flag": "chose_steal_medicine"
+    },
+    {
+      "id": "give_medicine",
+      "type": "story",
+      "name": "Healing Liara",
+      "description": "You administer the medicine to Liara. Color returns to her cheeks, and she thanks you profusely.",
+      "preconditions": {"got_medicine": true},
+      "effects": {"liara_saved": true},
+      "narrative_effects": ["chose_approach_mayor", "chose_errands"],
+      "choices": ["approach_mayor", "do_errands"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "do_errands",
+      "type": "story",
+      "name": "Civic Duty",
+      "description": "You decide to help the village by completing the mayor's tasks. There's a letter to deliver and rats to clear.",
+      "preconditions": {"learned_about_errands": true,
+        "or": [{"letter_delivered": false}, {"rats_cleared": false}]},
+      "effects": {},
+      "narrative_effects": ["chose_deliver_letter", "chose_clear_rats"],
+      "choices": ["deliver_letter", "clear_rats"],
+      "expected_player_flag": "chose_errands"
+    },
+    {
+      "id": "deliver_letter",
+      "type": "story",
+      "name": "A Message Delivered",
+      "description": "You deliver an important letter to the neighboring village. The recipient is grateful.",
+      "preconditions": {"letter_delivered": false},
+      "effects": {"letter_delivered": true},
+      "narrative_effects": ["continue"],
+      "choices": ["after_errand"],
+      "expected_player_flag": "chose_deliver_letter"
+    },
+    {
+      "id": "clear_rats",
+      "type": "story",
+      "name": "A Rat Problem",
+      "description": "You descend into the cellar and clear out the rats plaguing the village stores.",
+      "preconditions": {"rats_cleared": false},
+      "effects": {"rats_cleared": true},
+      "narrative_effects": ["continue"],
+      "choices": ["after_errand"],
+      "expected_player_flag": "chose_clear_rats"
+    },
+    {
+      "id": "after_errand",
+      "type": "story",
+      "name": "A Job Well Done?",
+      "description": "Having completed a task, you consider your next move. You could return to complete another, or go directly to the mayor.",
+      "preconditions": {
+        "or": [
+          {"letter_delivered": true},
+          {"rats_cleared": true}
+        ]
+      },
+      "effects": {"errands_done": true},
+      "narrative_effects": ["chose_approach_mayor", "chose_errands", "chose_help_liara"],
+      "choices": ["approach_mayor", "do_errands", "help_liara"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "secret_ritual",
+      "type": "story",
+      "name": "The Hidden Ritual",
+      "description": "You stumble upon an ancient ritual site deep in the woods. The air thrums with forgotten magic.",
+      "preconditions": {"ritual_unlocked": true},
+      "effects": {"ritual_performed": true},
+      "narrative_effects": [],
+      "choices": ["mayor_refuse"]
+    },
+    {
+      "id": "haunted_tower",
+      "type": "story",
+      "name": "The Haunted Tower",
+      "description": "A crumbling tower looms on the hill, said to hold the spirit of a long-dead sorcerer.",
+      "preconditions": {"tower_unsealed": true},
+      "effects": {"tower_cleansed": true},
+      "narrative_effects": [],
+      "choices": ["mayor_refuse"]
+    },
+    {
+      "id": "approach_mayor",
+      "type": "story",
+      "name": "The Final Audience",
+      "description": "You head to Mayor Edric to request funding for your expedition. He studies you, considering what you've done for him and the village.",
+      "preconditions": {"learned_about_liara": true, "learned_about_errands": true},
+      "effects": {"approached_mayor": true},
+      "narrative_effects": [],
+      "choices": ["full_support", "partial_support", "mayor_refuse"],
+      "expected_player_flag": "chose_approach_mayor"
+    },
+    {
+      "id": "full_support",
+      "type": "ending",
+      "name": "A Generous Patron",
+      "description": "Impressed by your deeds, the mayor grants you full funding and supplies for your expedition. The village will remember your heroism.",
+      "preconditions": {
+        "approached_mayor": true,
+        "liara_saved": true,
+        "errands_done": true,
+        "angered_merchant": false
+      },
+      "effects": {"ending_full_support": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "partial_support",
+      "type": "ending",
+      "name": "A Modest Contribution",
+      "description": "The mayor appreciates your help, but it's not enough for full funding, or your reputation precedes you. He offers half of what you need.",
+      "preconditions": {
+        "approached_mayor": true,
+        "or": [
+          {"liara_saved": true},
+          {"errands_done": true}
+        ]
+      },
+      "effects": {"ending_partial_support": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "mayor_refuse",
+      "type": "ending",
+      "name": "A Stern Refusal",
+      "description": "The mayor scoffs at your request. You've done nothing for him or the village. He orders you to leave.",
+      "preconditions": {
+        "approached_mayor": true,
+        "liara_saved": false,
+        "errands_done": false
+      },
+      "effects": {"ending_refused": true},
+      "narrative_effects": [],
+      "choices": []
+    }
+  ]
+}
