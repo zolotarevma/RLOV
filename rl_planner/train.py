@@ -3,6 +3,7 @@ import json
 from rl_planner.env import StoryEnv
 from rl_planner.dqn_agent import DQNAgent
 from pathlib import Path
+import csv
 
 
 def train(resume=False):
@@ -11,7 +12,7 @@ def train(resume=False):
     Сохраняет веса модели в 'dqn_model.pt' и порядок флагов в 'flags_order.json'.
     """
     project_root = Path(__file__).resolve().parent.parent
-    scenario_path = str(project_root / "experiments" / "scenarios" / "mayor_support.json")
+    scenario_path = str(project_root / "experiments" / "scenarios" / "expedition.json")
     env = StoryEnv(scenario_path, training=True)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
@@ -25,6 +26,7 @@ def train(resume=False):
     episodes = 100
     batch_size = 32
     target_update_freq = 10
+    rewards_history = []
 
     for ep in range(episodes):
         state = env.reset()
@@ -34,7 +36,7 @@ def train(resume=False):
             available = env._get_available()
             valid_actions = [env.beacon_to_idx[b["id"]] for b in available]
             if not valid_actions:
-                total_reward = -5.0
+                total_reward = -2000.0
                 done = True
                 break
             action = agent.select_action(state, valid_actions)
@@ -45,8 +47,14 @@ def train(resume=False):
             total_reward += reward
         if ep % target_update_freq == 0:
             agent.update_target()
+        rewards_history.append(total_reward)
         print(f"Episode {ep}, total reward: {total_reward:.2f}, epsilon: {agent.epsilon:.3f}")
 
+    with open("training_rewards.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["episode", "reward"])
+        for ep_num, r in enumerate(rewards_history, start=0):
+            writer.writerow([ep_num, r])
     agent.save("dqn_model.pt")
     print("Модель сохранена.")
 

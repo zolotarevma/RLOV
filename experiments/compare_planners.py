@@ -11,6 +11,7 @@ from metrics.structural import full_structure_report
 from metrics.diversity import pairwise_diversity
 from metrics.semantic import prompt_scene_similarity
 import logging
+
 logging.getLogger("huggingface_hub.utils._http").setLevel(logging.ERROR)
 
 
@@ -50,8 +51,7 @@ def _check_preconditions(state: GameState, pre: dict) -> bool:
     return True
 
 
-def _get_available(beacons: list[dict], state: GameState, path: list[str],
-                   last_player_flag: str | None = None) -> list[dict]:
+def _get_available(beacons: list[dict], state: GameState, path: list[str]) -> list[dict]:
     if not path:
         return [b for b in beacons if b["type"] == "start"]
 
@@ -60,17 +60,10 @@ def _get_available(beacons: list[dict], state: GameState, path: list[str],
     choices_ids = current_beacon.get("choices", [])
     available = []
 
-    if current_beacon.get("narrative_effects") and last_player_flag:
-        choices_ids = [
-            cid for cid in choices_ids
-            if next(b for b in beacons if b["id"] == cid).get("expected_player_flag") == last_player_flag
-        ]
-
     for cid in choices_ids:
         b = next(bb for bb in beacons if bb["id"] == cid)
         if _check_preconditions(state, b.get("preconditions", {})):
-            if cid not in path:  # чтобы не зацикливаться
-                available.append(b)
+            available.append(b)
     return available
 
 
@@ -102,10 +95,9 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
     dead_ends_hit = 0
     unreachable_hit = False
     reached_ending = False
-    last_player_flag = None
 
     for _ in range(20):
-        available = _get_available(beacons, state, path, last_player_flag)
+        available = _get_available(beacons, state, path)
         if not available:
             break
 
@@ -141,9 +133,6 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
             effect = selected_opt.get("effect", "") if isinstance(selected_opt, dict) else ""
             if effect and effect != "none":
                 state.set_flag(effect, True)
-                last_player_flag = effect
-            else:
-                last_player_flag = None
 
             if expected_flag is not None:
                 consistency_total += 1
@@ -169,8 +158,16 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
             reached_ending = True
             break
 
+    ending_id = None
+    if reached_ending and path:
+        last_id = path[-1]
+        last_beacon = next((b for b in beacons if b["id"] == last_id), None)
+        if last_beacon and last_beacon.get("type") == "ending":
+            ending_id = last_id
+
     return {
         "path": path,
+        "ending_id": ending_id,
         "dead_ends": dead_ends_hit,
         "unreachable_endings": 1 if unreachable_hit else 0,
         "reached_ending": reached_ending,
@@ -213,7 +210,7 @@ def make_planner(planner_type: str, beacons: list[dict]):
 # ──────────────────────── запуск сравнения ───────────────────────────────
 
 def main():
-    scenario_path = "scenarios/mayor_support.json"
+    scenario_path = "scenarios/expedition.json"
     scenario = load_scenario(scenario_path)
     beacons = scenario["beacons"]
 
@@ -224,6 +221,7 @@ def main():
     for ptype in planner_types:
         planner = make_planner(ptype, beacons)
         all_paths = []
+        all_endings = []
         all_intros = []
         all_sim_pairs = []
         total_rej = 0
@@ -236,6 +234,8 @@ def main():
         for _ in range(n_runs):
             res = run_single(scenario, planner, collect_scenes=True)
             all_paths.append(res["path"])
+            if res["ending_id"]:
+                all_endings.append(res["ending_id"])
             all_intros.extend(res["scene_intros"])
             all_sim_pairs.extend(res["sim_pairs"])
             total_rej += res["total_rejections"]
@@ -263,6 +263,16 @@ def main():
         error_counts = Counter(all_error_types)
         most_common_errors = error_counts.most_common(3)
 
+        ending_counter = Counter(all_endings)
+        total_endings = len(all_endings)
+        ending_percentages = {
+            eid: (count / total_endings * 100) if total_endings else 0
+            for eid, count in ending_counter.items()
+        }
+        score_map = {"perfect_ending": 3, "good_ending": 2, "bad_ending": 1}
+        avg_score = sum(score_map.get(eid, 1) * count for eid, count in
+                        ending_counter.items()) / total_endings if total_endings else 0.0
+
         results[ptype] = {
             "avg_steps": struct["avg_steps"],
             "avg_unique": struct["avg_unique_beacons"],
@@ -275,6 +285,8 @@ def main():
             "fallback_rate": fallback_rate,
             "avg_gen_time": avg_gen_time,
             "consistency": consistency,
+            "ending_distribution": ending_percentages,
+            "ending_avg_score": avg_score,
             "top_errors": most_common_errors,
         }
 
@@ -296,6 +308,30 @@ def main():
         f"{'fallback_rate':<30} {results['heuristic']['fallback_rate']:>12.3f} {results['dqn']['fallback_rate']:>12.3f}")
     print(f"\nТоп ошибок валидатора (heuristic): {results['heuristic']['top_errors']}")
     print(f"Топ ошибок валидатора (DQN): {results['dqn']['top_errors']}")
+    print("\nРаспределение концовок (%):")
+    all_ending_ids = ["perfect_ending", "good_ending", "bad_ending"]
+    header2 = f"{'Концовка':<25} {'Heuristic':>10} {'DQN':>10}"
+    print(header2)
+    print("-" * len(header2))
+    for eid in all_ending_ids:
+        h_pct = results["heuristic"]["ending_distribution"].get(eid, 0.0)
+        d_pct = results["dqn"]["ending_distribution"].get(eid, 0.0)
+        print(f"{eid:<25} {h_pct:>9.1f}% {d_pct:>9.1f}%")
+    print(f"\nСредний балл концовок (3=perfect, 2=good, 1=bad):")
+    print(f"  Heuristic: {results['heuristic']['ending_avg_score']:.2f}")
+    print(f"  DQN:       {results['dqn']['ending_avg_score']:.2f}")
+
+    with open("planner_comparison.json", "w") as f:
+        json.dump({
+            "heuristic": {
+                "ending_distribution": {k: v for k, v in results["heuristic"]["ending_distribution"].items()},
+                "ending_avg_score": results["heuristic"]["ending_avg_score"]
+            },
+            "dqn": {
+                "ending_distribution": {k: v for k, v in results["dqn"]["ending_distribution"].items()},
+                "ending_avg_score": results["dqn"]["ending_avg_score"]
+            }
+        }, f, indent=2)
 
 
 if __name__ == "__main__":

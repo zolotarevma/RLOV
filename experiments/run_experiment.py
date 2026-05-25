@@ -14,6 +14,8 @@ from metrics.diversity import pairwise_diversity
 from metrics.semantic import prompt_scene_similarity
 from config import LLM_CLIENT, OLLAMA_MODEL, GEMINI_MODEL, OPENROUTER_MODEL
 import logging
+import random
+random.seed(42)
 logging.getLogger("huggingface_hub.utils._http").setLevel(logging.ERROR)
 
 
@@ -84,8 +86,7 @@ def _check_preconditions(state: GameState, pre: dict) -> bool:
     return True
 
 
-def _get_available(beacons: list[dict], state: GameState, path: list[str],
-                   last_player_flag: str | None = None) -> list[dict]:
+def _get_available(beacons: list[dict], state: GameState, path: list[str]) -> list[dict]:
     if not path:
         return [b for b in beacons if b["type"] == "start"]
 
@@ -94,17 +95,10 @@ def _get_available(beacons: list[dict], state: GameState, path: list[str],
     choices_ids = current_beacon.get("choices", [])
     available = []
 
-    if current_beacon.get("narrative_effects") and last_player_flag:
-        choices_ids = [
-            cid for cid in choices_ids
-            if next(b for b in beacons if b["id"] == cid).get("expected_player_flag") == last_player_flag
-        ]
-
     for cid in choices_ids:
         b = next(bb for bb in beacons if bb["id"] == cid)
         if _check_preconditions(state, b.get("preconditions", {})):
-            if cid not in path:
-                available.append(b)
+            available.append(b)
     return available
 
 
@@ -136,10 +130,9 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
     dead_ends_hit = 0
     unreachable_hit = False
     reached_ending = False
-    last_player_flag = None
 
     for _ in range(20):
-        available = _get_available(beacons, state, path, last_player_flag)
+        available = _get_available(beacons, state, path)
         if not available:
             break
 
@@ -160,7 +153,7 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
 
         player_options = scene.get("player_options", [])
         if player_options and chosen["type"] != "ending":
-            opt = player_options[0]
+            opt = random.choice(player_options)
             effect = opt.get("effect", "") if isinstance(opt, dict) else ""
 
             expected_flag = chosen.get("expected_player_flag")
@@ -171,11 +164,6 @@ def run_single(scenario: dict, planner, collect_scenes: bool = True) -> dict:
 
             if effect and effect != "none":
                 state.set_flag(effect, True)
-                last_player_flag = effect
-            else:
-                last_player_flag = None
-        else:
-            last_player_flag = None
 
         _apply_effects(state, chosen)
         path.append(chosen_id)
@@ -239,7 +227,7 @@ def make_planner(planner_type: str, beacons: list[dict]):
 # ──────────────────────────── запуск ─────────────────────────────────────
 
 def main():
-    scenario_path = "scenarios/mayor_support.json"
+    scenario_path = "scenarios/expedition.json"
     scenario = load_scenario(scenario_path)
     beacons = scenario["beacons"]
 

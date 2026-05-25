@@ -60,9 +60,9 @@ class StoryEnv(gymnasium.Env):
             or_satisfied = any(
                 all(
                     (lambda fv: (
-                        (fv is True and self.state.has_flag(k) and self.state.get_flag(k) is True) or
-                        (fv is False and (not self.state.has_flag(k) or self.state.get_flag(k) is False)) or
-                        (fv not in (True, False) and self.state.has_flag(k) and self.state.get_flag(k) == fv)
+                            (fv is True and self.state.has_flag(k) and self.state.get_flag(k) is True) or
+                            (fv is False and (not self.state.has_flag(k) or self.state.get_flag(k) is False)) or
+                            (fv not in (True, False) and self.state.has_flag(k) and self.state.get_flag(k) == fv)
                     ))(v)
                     for k, v in cond.items()
                 )
@@ -81,17 +81,10 @@ class StoryEnv(gymnasium.Env):
         choices_ids = current_beacon.get("choices", [])
         available = []
 
-        if current_beacon.get("narrative_effects") and self.last_player_flag:
-            choices_ids = [
-                cid for cid in choices_ids
-                if next(b for b in self.beacons if b["id"] == cid).get("expected_player_flag") == self.last_player_flag
-            ]
-
         for bid in choices_ids:
             b = next(bb for bb in self.beacons if bb["id"] == bid)
             if self._check_preconditions(b.get("preconditions", {})):
-                if bid not in self.path:
-                    available.append(b)
+                available.append(b)
         return available
 
     def reset(self):
@@ -118,7 +111,7 @@ class StoryEnv(gymnasium.Env):
         available_ids = [b["id"] for b in available]
 
         if chosen_id not in available_ids:
-            reward = -10.0
+            reward = -1000.0
             self.done = True
             return self._state_to_vector(), reward, self.done, {"error": "invalid_action"}
 
@@ -137,10 +130,7 @@ class StoryEnv(gymnasium.Env):
         player_options = scene.get("player_options", [])
         new_player_flag = None
         if player_options and chosen["type"] != "ending":
-            if self.training:
-                opt = player_options[0]
-            else:
-                opt = random.choice(player_options)
+            opt = random.choice(player_options)
             effect = opt.get("effect", "") if isinstance(opt, dict) else ""
             if effect and effect != "none":
                 self.state.set_flag(effect, True)
@@ -181,13 +171,15 @@ class StoryEnv(gymnasium.Env):
                             satisfied_conditions += 1
 
                     match_ratio = satisfied_conditions / total_conditions
+                    unsatisfied_conditions = total_conditions - satisfied_conditions
                 else:
                     match_ratio = 1.0
                     satisfied_conditions = 0
+                    unsatisfied_conditions = 0
 
-                reward = float(unique_beacons) / 10 + match_ratio * 2.0 + 0.1 * satisfied_conditions
+                reward = float(unique_beacons) / 10 + match_ratio * 1.0 + 100 * satisfied_conditions - 10 * unsatisfied_conditions
             else:
-                reward = -10.0
+                reward = -3000.0
         else:
             reward = consistency_reward
 

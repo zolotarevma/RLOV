@@ -1,0 +1,294 @@
+{
+  "title": "Expedition to the Forgotten Temple",
+  "description": "Assemble allies, choose your path, and reach the ancient temple before your strength fails.",
+  "initial_flags": {},
+  "beacons": [
+    {
+      "id": "start",
+      "type": "start",
+      "name": "The Keeper's Offer",
+      "description": "The Keeper of Knowledge offers you a choice of three items to aid your quest: a detailed map, a magical compass, or extra supplies.",
+      "preconditions": {},
+      "effects": {},
+      "narrative_effects": ["take_map", "take_compass", "take_supplies"],
+      "choices": ["chose_map", "chose_compass", "chose_supplies"]
+    },
+    {
+      "id": "chose_map",
+      "type": "story",
+      "name": "The Map",
+      "description": "You take the ancient map, which reveals hidden paths through the wilderness.",
+      "preconditions": {},
+      "effects": {"has_map": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_map"
+    },
+    {
+      "id": "chose_compass",
+      "type": "story",
+      "name": "The Compass",
+      "description": "You take the magical compass, which always points toward your goal.",
+      "preconditions": {},
+      "effects": {"has_compass": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_compass"
+    },
+    {
+      "id": "chose_supplies",
+      "type": "story",
+      "name": "The Supplies",
+      "description": "You take the extra supplies, ensuring you can endure longer hardships.",
+      "preconditions": {},
+      "effects": {"extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_supplies"
+    },
+    {
+      "id": "quest_received_beacon",
+      "type": "story",
+      "name": "The Keeper's Blessing",
+      "description": "The Keeper entrusts you with the mission to retrieve the Orb of Ages from the Forgotten Temple.",
+      "preconditions": {},
+      "effects": {"quest_received": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "gathering_info",
+      "type": "story",
+      "name": "The City's Factions",
+      "description": "At the tavern, you learn of three factions who might help: the Mages' Guild, the Warriors' Brotherhood, and the Merchant Consortium. You can offer your aid to earn their support.",
+      "preconditions": {"quest_received": true},
+      "effects": {"learned_about_guilds": true},
+      "narrative_effects": ["help_mages", "help_warriors", "help_merchant", "leave_city"],
+      "choices": ["help_mages", "help_warriors", "help_merchant", "leave_city"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "help_mages",
+      "type": "story",
+      "name": "Aid the Mages",
+      "description": "You assist the mages in recovering a lost scroll. They reward you with a protective charm and knowledge of arcane paths.",
+      "preconditions": {"learned_about_guilds": true, "mages_helped": false},
+      "effects": {"mages_helped": true, "got_magic_charm": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_mages"
+    },
+    {
+      "id": "help_warriors",
+      "type": "story",
+      "name": "Aid the Warriors",
+      "description": "You clear a nest of beasts threatening the warriors' keep. They grant you a stout shield and a guide who knows the wilds.",
+      "preconditions": {"learned_about_guilds": true, "warriors_helped": false},
+      "effects": {"warriors_helped": true, "got_ranger_guide": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_warriors"
+    },
+    {
+      "id": "help_merchant",
+      "type": "story",
+      "name": "Aid the Merchant",
+      "description": "You negotiate a trade deal for the merchant, who in return supplies you with rare provisions and gold.",
+      "preconditions": {"learned_about_guilds": true, "merchant_helped": false},
+      "effects": {"merchant_helped": true, "extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_merchant"
+    },
+    {
+      "id": "leave_city",
+      "type": "story",
+      "name": "Departing the City",
+      "description": "You set out from the city walls. Ahead lie two routes: the Whispering Forest or the Sunken Catacombs.",
+      "preconditions": {"learned_about_guilds": true},
+      "effects": {"left_city": true},
+      "narrative_effects": [],
+      "choices": [
+        "forest_path_safe",
+        "forest_path_hardship",
+        "catacomb_path_safe",
+        "catacomb_path_hardship"
+      ],
+      "expected_player_flag": "leave_city"
+    },
+    {
+      "id": "forest_path_safe",
+      "type": "story",
+      "name": "Through the Whispering Forest (Safe)",
+      "description": "The forest is dense, but your compass or ranger guide leads you safely through.",
+      "preconditions": {
+        "left_city": true,
+        "or": [
+          {"has_compass": true},
+          {"got_ranger_guide": true}
+        ]
+      },
+      "effects": {"forest_completed": true, "catacomb_hardship": false, "forest_hardship": false},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "forest_path_hardship",
+      "type": "story",
+      "name": "Through the Whispering Forest (Hardship)",
+      "description": "The forest is disorienting. Without a guide or compass, you stumble through, exhausted and wounded.",
+      "preconditions": {
+        "left_city": true,
+        "has_compass": false,
+        "got_ranger_guide": false
+      },
+      "effects": {"forest_completed": true, "forest_hardship": true},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "catacomb_path_safe",
+      "type": "story",
+      "name": "Beneath the Sunken Catacombs (Safe)",
+      "description": "The magic charm or ancient map lights your way through the catacombs, avoiding its deadliest traps.",
+      "preconditions": {
+        "left_city": true,
+        "or": [
+          {"has_map": true},
+          {"got_magic_charm": true}
+        ]
+      },
+      "effects": {"catacombs_completed": true, "catacomb_hardship": false, "forest_hardship": false},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "catacomb_path_hardship",
+      "type": "story",
+      "name": "Beneath the Sunken Catacombs (Hardship)",
+      "description": "The darkness overwhelms you. Without a map or charm, you blunder into traps and emerge battered.",
+      "preconditions": {
+        "left_city": true,
+        "has_map": false,
+        "got_magic_charm": false
+      },
+      "effects": {"catacombs_completed": true, "catacomb_hardship": true},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "midpoint",
+      "type": "story",
+      "name": "Crossroads",
+      "description": "You reach a clearing with an ancient shrine. A hidden cache lies nearby, but the temple is just ahead. Time and strength are pressing.",
+      "preconditions": {
+        "or": [{"forest_completed": true}, {"catacombs_completed": true}]
+      },
+      "effects": {"reached_midpoint": true},
+      "narrative_effects": [],
+      "choices": ["temple_approach", "hidden_cache_safe", "hidden_cache_risky"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "hidden_cache_safe",
+      "type": "story",
+      "name": "A Safe Discovery",
+      "description": "You locate the cache without incident. It contains valuable relics and fresh supplies that renew your strength.",
+      "preconditions": {
+        "reached_midpoint": true,
+        "forest_hardship": false,
+        "catacomb_hardship": false
+      },
+      "effects": {"got_treasure": true, "extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["temple_approach"]
+    },
+    {
+      "id": "hidden_cache_risky",
+      "type": "story",
+      "name": "A Costly Gamble",
+      "description": "You find the cache, but the effort drains you completely. You gain relics, but your body is battered.",
+      "preconditions": {
+        "reached_midpoint": true,
+        "or": [{"forest_hardship": true}, {"catacomb_hardship": true}]
+      },
+      "effects": {"got_treasure": true, "exhausted": true},
+      "narrative_effects": ["continue"],
+      "choices": ["temple_approach"]
+    },
+    {
+      "id": "temple_approach",
+      "type": "story",
+      "name": "Approaching the Forgotten Temple",
+      "description": "The temple looms before you. The final challenge awaits. How you have prepared will decide your fate.",
+      "preconditions": {"reached_midpoint": true},
+      "effects": {"approached_temple": true},
+      "narrative_effects": [],
+      "choices": ["final_choice"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "final_choice",
+      "type": "story",
+      "name": "The Final Decision",
+      "description": "You stand at the threshold. The Orb is within reach, but your choices echo. The agent chooses the outcome.",
+      "preconditions": {"approached_temple": true},
+      "effects": {},
+      "narrative_effects": [],
+      "choices": ["perfect_ending", "good_ending", "bad_ending"]
+    },
+    {
+      "id": "perfect_ending",
+      "type": "ending",
+      "name": "Champion of the Ages",
+      "description": "With full strength and allies' blessings, you claim the Orb and are hailed as a hero.",
+      "preconditions": {
+          "approached_temple": true,
+          "exhausted": false,
+          "extra_supplies": true,
+          "or": [
+              {"mages_helped": true, "warriors_helped": true},
+              {"mages_helped": true, "merchant_helped": true},
+              {"warriors_helped": true, "merchant_helped": true}
+          ]
+      },
+      "effects": {"ending_perfect": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "good_ending",
+      "type": "ending",
+      "name": "A Bitter Success",
+      "description": "You secure the Orb, but the cost is high. Your deeds are remembered, yet not sung.",
+      "preconditions": {
+        "approached_temple": true,
+        "exhausted": false,
+        "or": [
+          {"mages_helped": true},
+          {"warriors_helped": true},
+          {"merchant_helped": true}
+        ]
+      },
+      "effects": {"ending_good": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "bad_ending",
+      "type": "ending",
+      "name": "Lost in the Dark",
+      "description": "The temple swallows you. Your journey ends in silence, another forgotten soul.",
+      "preconditions": {"approached_temple": true,
+      "or": [
+          {"exhausted": true},
+          {"mages_helped": false, "warriors_helped": false, "merchant_helped": false}
+        ]
+      },
+      "effects": {"ending_bad": true},
+      "narrative_effects": [],
+      "choices": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "heuristic": {
+    "ending_distribution": {
+      "bad_ending": 43.333333333333336,
+      "perfect_ending": 23.333333333333332,
+      "good_ending": 33.33333333333333
+    },
+    "ending_avg_score": 1.8
+  },
+  "dqn": {
+    "ending_distribution": {
+      "perfect_ending": 100.0
+    },
+    "ending_avg_score": 3.0
+  }
+}
