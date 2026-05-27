@@ -13,3 +13,4 @@ matplotlib
 seaborn
 jupyter
 pathlib
+urllib3

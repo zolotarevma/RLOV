@@ -2,9 +2,11 @@
 
 import json
 import time
+from config import LANGUAGE
 from .client import call_llm
-from .prompts import SYSTEM_PROMPT, build_prompt
+from .prompts import SYSTEM_PROMPT, SYSTEM_PROMPT_RU, build_prompt
 from validator.scene_checker import validate_scene_json
+import re
 
 MAX_RETRIES = 5
 RETRY_DELAY = 2
@@ -19,12 +21,26 @@ def generate_scene(beacon: dict, state: dict) -> dict:
     t_start = time.time()
 
     for attempt in range(MAX_RETRIES):
-        raw = call_llm(SYSTEM_PROMPT, prompt)
+        system_prompt = SYSTEM_PROMPT_RU if LANGUAGE == "ru" else SYSTEM_PROMPT
+        raw = call_llm(system_prompt, prompt)
+
+        cleaned = raw.strip()
+        cleaned = re.sub(r'//.*', '', cleaned)
+        if cleaned.startswith("```json"):
+            cleaned = cleaned[7:]
+        if cleaned.endswith("```"):
+            cleaned = cleaned[:-3]
+        cleaned = cleaned.strip()
+        start_idx = cleaned.find('{')
+        end_idx = cleaned.rfind('}')
+        if start_idx != -1 and end_idx != -1:
+            cleaned = cleaned[start_idx:end_idx+1]
         try:
-            scene = json.loads(raw)
+            scene = json.loads(cleaned)
         except json.JSONDecodeError:
             rejections += 1
             error_types.append("Invalid JSON")
+            print(f"[WARN] Invalid JSON")
             time.sleep(RETRY_DELAY)
             continue
 

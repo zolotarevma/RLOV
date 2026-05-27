@@ -79,7 +79,7 @@ def apply_effects(state: GameState, beacon: dict) -> None:
 
 
 def main() -> None:
-    scenario = load_scenario(f"{SCENARIOS_DIR}/expedition.json")
+    scenario = load_scenario(f"{SCENARIOS_DIR}/mayor_support_ru.json")
     print(f"=== {scenario['title']} ===\n")
 
     if PLANNER == "dqn":

@@ -11,10 +11,15 @@ from config import (
     GEMINI_MODEL,
     OPENROUTER_API_KEY,
     OPENROUTER_MODEL,
-    OPENROUTER_API_BASE
+    OPENROUTER_API_BASE,
+    GIGACHAT_MODEL,
+    GIGACHAT_TEMPERATURE,
+    GIGACHAT_MAX_TOKENS
 )
 from abc import ABC, abstractmethod
 from typing import Dict, Type
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class LLMClient(ABC):
@@ -132,11 +137,49 @@ class OpenRouterClient(LLMClient):
         return ""
 
 
+class GigaChatClient(LLMClient):
+
+    def generate(self, system: str, prompt: str) -> str:
+        from llm_generator.gigachat_auth import get_access_token
+        token = get_access_token()
+        if not token:
+            return '{"intro": "GigaChat token error.", "dialogues": [], "player_options": []}'
+
+        url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": GIGACHAT_MODEL,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": GIGACHAT_TEMPERATURE,
+            "max_tokens": GIGACHAT_MAX_TOKENS
+        }
+        try:
+            resp = requests.post(url, headers=headers, json=payload, verify=False)
+            resp.raise_for_status()
+            data = resp.json()
+            text = data["choices"][0]["message"]["content"]
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.endswith("```"):
+                text = text[:-3]
+            return text.strip()
+        except Exception as e:
+            print(f"[GigaChat] Error: {e}")
+            return '{"intro": "GigaChat failed to generate.", "dialogues": [], "player_options": []}'
+
+
 _CLIENT_MAP: Dict[str, Type[LLMClient]] = {
     "stub": StubClient,
     "ollama": OllamaClient,
     "gemini": GeminiClient,
     "openrouter": OpenRouterClient,
+    "gigachat": GigaChatClient,
 }
 
 

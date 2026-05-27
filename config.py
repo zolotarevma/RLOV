@@ -4,11 +4,12 @@ import os
 # Путь к файлам сценариев
 SCENARIOS_DIR = "experiments/scenarios"
 
-# LLM-клиент: "stub", "ollama", "gemini", "openrouter"
-LLM_CLIENT = "stub"
+# LLM-клиент: "stub", "ollama", "gemini", "openrouter", "gigachat"
+LLM_CLIENT = ""
 
 # Параметры для Ollama "llama3.1:8b", "mistral:7b", "gemma2:9b", "qwen2.5:7b"
-OLLAMA_MODEL = "llama3.1:8b"
+# "rscr/vikhr_llama3.1_8b:Q4_K_M", "bambucha/saiga-llama3:8b", "ilyagusev/saiga_nemo_12b:latest"
+OLLAMA_MODEL = ""
 OLLAMA_HOST = "http://localhost:11434"
 
 # Параметры для OpenRouter "openai/gpt-oss-120b:free"
@@ -19,6 +20,16 @@ OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
 # Google Gemini
 GEMINI_MODEL = "gemini-3.1-flash-lite-preview"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")  # получите ключ в Google AI Studio
+
+# GigaChat
+GIGACHAT_TOKEN = os.getenv("GIGACHAT_TOKEN", "")
+GIGACHAT_MODEL = "GigaChat-2"
+GIGACHAT_TEMPERATURE = 0.2
+GIGACHAT_MAX_TOKENS = 5000
+GIGACHAT_AUTHORIZATION_KEY = os.getenv("GIGACHAT_AUTHORIZATION_KEY", "")  # получите ключ авторизации в Sber Developer Studio
+
+# Язык генерации: "en" или "ru"
+LANGUAGE = "ru"
 
 # Максимальное количество шагов в сценарии
 MAX_STEPS = 20

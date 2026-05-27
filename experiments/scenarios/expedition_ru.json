@@ -1,0 +1,294 @@
+{
+  "title": "Экспедиция к Забытому Храму",
+  "description": "Собери союзников, выбери путь и достигни древнего храма, пока не иссякли силы.",
+  "initial_flags": {},
+  "beacons": [
+    {
+      "id": "start",
+      "type": "start",
+      "name": "Предложение Хранителя",
+      "description": "Хранитель Знаний предлагает тебе выбрать один из трёх предметов, которые помогут в пути: подробную карту, магический компас или дополнительные припасы.",
+      "preconditions": {},
+      "effects": {},
+      "narrative_effects": ["take_map", "take_compass", "take_supplies"],
+      "choices": ["chose_map", "chose_compass", "chose_supplies"]
+    },
+    {
+      "id": "chose_map",
+      "type": "story",
+      "name": "Карта",
+      "description": "Ты берёшь древнюю карту, на которой отмечены потайные тропы через дикие земли.",
+      "preconditions": {},
+      "effects": {"has_map": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_map"
+    },
+    {
+      "id": "chose_compass",
+      "type": "story",
+      "name": "Компас",
+      "description": "Ты берёшь магический компас, который всегда указывает на твою цель.",
+      "preconditions": {},
+      "effects": {"has_compass": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_compass"
+    },
+    {
+      "id": "chose_supplies",
+      "type": "story",
+      "name": "Припасы",
+      "description": "Ты берёшь дополнительные припасы, чтобы выдержать долгие испытания.",
+      "preconditions": {},
+      "effects": {"extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["quest_received_beacon"],
+      "expected_player_flag": "take_supplies"
+    },
+    {
+      "id": "quest_received_beacon",
+      "type": "story",
+      "name": "Благословение Хранителя",
+      "description": "Хранитель поручает тебе миссию: добыть Сферу Времён из Забытого Храма.",
+      "preconditions": {},
+      "effects": {"quest_received": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "gathering_info",
+      "type": "story",
+      "name": "Городские фракции",
+      "description": "В таверне ты узнаёшь о трёх фракциях, которые могут помочь: Гильдия Магов, Братство Воинов и Торговый Консорциум. Ты можешь предложить им свою помощь, чтобы заручиться поддержкой.",
+      "preconditions": {"quest_received": true},
+      "effects": {"learned_about_guilds": true},
+      "narrative_effects": ["help_mages", "help_warriors", "help_merchant", "leave_city"],
+      "choices": ["help_mages", "help_warriors", "help_merchant", "leave_city"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "help_mages",
+      "type": "story",
+      "name": "Помощь Магам",
+      "description": "Ты помогаешь магам вернуть утерянный свиток. В награду они даруют тебе защитный амулет и знание тайных путей.",
+      "preconditions": {"learned_about_guilds": true, "mages_helped": false},
+      "effects": {"mages_helped": true, "got_magic_charm": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_mages"
+    },
+    {
+      "id": "help_warriors",
+      "type": "story",
+      "name": "Помощь Воинам",
+      "description": "Ты зачищаешь логово зверей, угрожавших цитадели воинов. Они дарят тебе крепкий щит и проводника, знающего дикие земли.",
+      "preconditions": {"learned_about_guilds": true, "warriors_helped": false},
+      "effects": {"warriors_helped": true, "got_ranger_guide": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_warriors"
+    },
+    {
+      "id": "help_merchant",
+      "type": "story",
+      "name": "Помощь Торговцу",
+      "description": "Ты заключаешь выгодную сделку для торговца, и он снабжает тебя редкими товарами и золотом.",
+      "preconditions": {"learned_about_guilds": true, "merchant_helped": false},
+      "effects": {"merchant_helped": true, "extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["gathering_info"],
+      "expected_player_flag": "help_merchant"
+    },
+    {
+      "id": "leave_city",
+      "type": "story",
+      "name": "Покидая город",
+      "description": "Ты выходишь за городские стены. Впереди два пути: Шепчущий Лес или Затопленные Катакомбы.",
+      "preconditions": {"learned_about_guilds": true},
+      "effects": {"left_city": true},
+      "narrative_effects": [],
+      "choices": [
+        "forest_path_safe",
+        "forest_path_hardship",
+        "catacomb_path_safe",
+        "catacomb_path_hardship"
+      ],
+      "expected_player_flag": "leave_city"
+    },
+    {
+      "id": "forest_path_safe",
+      "type": "story",
+      "name": "Шепчущий Лес (Безопасный)",
+      "description": "Лес полон теней, но твой компас или проводник-следопыт ведут тебя безопасной тропой.",
+      "preconditions": {
+        "left_city": true,
+        "or": [
+          {"has_compass": true},
+          {"got_ranger_guide": true}
+        ]
+      },
+      "effects": {"forest_completed": true, "catacomb_hardship": false, "forest_hardship": false},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "forest_path_hardship",
+      "type": "story",
+      "name": "Шепчущий Лес (Трудности)",
+      "description": "Без проводника или компаса ты блуждаешь в чаще, выходя из леса измученным и раненым.",
+      "preconditions": {
+        "left_city": true,
+        "has_compass": false,
+        "got_ranger_guide": false
+      },
+      "effects": {"forest_completed": true, "forest_hardship": true},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "catacomb_path_safe",
+      "type": "story",
+      "name": "Затопленные Катакомбы (Безопасный)",
+      "description": "Магический амулет или древняя карта освещают путь сквозь катакомбы, позволяя избежать смертельных ловушек.",
+      "preconditions": {
+        "left_city": true,
+        "or": [
+          {"has_map": true},
+          {"got_magic_charm": true}
+        ]
+      },
+      "effects": {"catacombs_completed": true, "catacomb_hardship": false, "forest_hardship": false},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "catacomb_path_hardship",
+      "type": "story",
+      "name": "Затопленные Катакомбы (Трудности)",
+      "description": "Тьма окутывает тебя. Без карты или амулета ты попадаешь в ловушки и выбираешься из подземелий израненным.",
+      "preconditions": {
+        "left_city": true,
+        "has_map": false,
+        "got_magic_charm": false
+      },
+      "effects": {"catacombs_completed": true, "catacomb_hardship": true},
+      "narrative_effects": ["continue"],
+      "choices": ["midpoint"]
+    },
+    {
+      "id": "midpoint",
+      "type": "story",
+      "name": "Перекрёсток",
+      "description": "Ты выходишь к поляне с древним святилищем. Неподалёку спрятан тайник, но храм уже близок. Время и силы на исходе.",
+      "preconditions": {
+        "or": [{"forest_completed": true}, {"catacombs_completed": true}]
+      },
+      "effects": {"reached_midpoint": true},
+      "narrative_effects": [],
+      "choices": ["temple_approach", "hidden_cache_safe", "hidden_cache_risky"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "hidden_cache_safe",
+      "type": "story",
+      "name": "Безопасная находка",
+      "description": "Ты находишь тайник без происшествий. Внутри — ценные реликвии и свежие припасы, восстанавливающие силы.",
+      "preconditions": {
+        "reached_midpoint": true,
+        "forest_hardship": false,
+        "catacomb_hardship": false
+      },
+      "effects": {"got_treasure": true, "extra_supplies": true},
+      "narrative_effects": ["continue"],
+      "choices": ["temple_approach"]
+    },
+    {
+      "id": "hidden_cache_risky",
+      "type": "story",
+      "name": "Рискованная попытка",
+      "description": "Ты находишь тайник, но усилия истощают тебя до предела. Реликвии у тебя, но тело изранено.",
+      "preconditions": {
+        "reached_midpoint": true,
+        "or": [{"forest_hardship": true}, {"catacomb_hardship": true}]
+      },
+      "effects": {"got_treasure": true, "exhausted": true},
+      "narrative_effects": ["continue"],
+      "choices": ["temple_approach"]
+    },
+    {
+      "id": "temple_approach",
+      "type": "story",
+      "name": "Приближаясь к Забытому Храму",
+      "description": "Храм возвышается перед тобой. Последнее испытание ждёт. Твоя подготовка решит твою судьбу.",
+      "preconditions": {"reached_midpoint": true},
+      "effects": {"approached_temple": true},
+      "narrative_effects": [],
+      "choices": ["final_choice"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "final_choice",
+      "type": "story",
+      "name": "Последнее решение",
+      "description": "Ты стоишь на пороге. Сфера Времён уже близка, но эхо прошлых выборов звучит вокруг. Агент выбирает финал.",
+      "preconditions": {"approached_temple": true},
+      "effects": {},
+      "narrative_effects": [],
+      "choices": ["perfect_ending", "good_ending", "bad_ending"]
+    },
+    {
+      "id": "perfect_ending",
+      "type": "ending",
+      "name": "Чемпион Веков",
+      "description": "Полный сил и благословения союзников, ты завладеваешь Сферой, и тебя провозглашают героем.",
+      "preconditions": {
+          "approached_temple": true,
+          "exhausted": false,
+          "extra_supplies": true,
+          "or": [
+              {"mages_helped": true, "warriors_helped": true},
+              {"mages_helped": true, "merchant_helped": true},
+              {"warriors_helped": true, "merchant_helped": true}
+          ]
+      },
+      "effects": {"ending_perfect": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "good_ending",
+      "type": "ending",
+      "name": "Горький успех",
+      "description": "Ты добываешь Сферу, но дорогой ценой. Твои деяния запомнят, но не воспоют.",
+      "preconditions": {
+        "approached_temple": true,
+        "exhausted": false,
+        "or": [
+          {"mages_helped": true},
+          {"warriors_helped": true},
+          {"merchant_helped": true}
+        ]
+      },
+      "effects": {"ending_good": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "bad_ending",
+      "type": "ending",
+      "name": "Потерянный во тьме",
+      "description": "Храм поглощает тебя. Твой путь обрывается в молчании — ещё одна забытая душа.",
+      "preconditions": {"approached_temple": true,
+      "or": [
+          {"exhausted": true},
+          {"mages_helped": false, "warriors_helped": false, "merchant_helped": false}
+        ]
+      },
+      "effects": {"ending_bad": true},
+      "narrative_effects": [],
+      "choices": []
+    }
+  ]
+}

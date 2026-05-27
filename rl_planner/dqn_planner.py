@@ -31,7 +31,6 @@ class DQNPlanner(BasePlanner):
 
     def select_beacon(self, state: "GameState", available_beacons: list[dict]) -> str:
         if not self.beacon_to_idx:
-            # fallback
             return available_beacons[0]["id"]
         valid_ids = [b["id"] for b in available_beacons]
         valid_actions = [self.beacon_to_idx[i] for i in valid_ids]

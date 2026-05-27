@@ -12,7 +12,7 @@ from llm_generator.generator import generate_scene
 from metrics.structural import full_structure_report
 from metrics.diversity import pairwise_diversity
 from metrics.semantic import prompt_scene_similarity
-from config import LLM_CLIENT, OLLAMA_MODEL, GEMINI_MODEL, OPENROUTER_MODEL
+from config import LLM_CLIENT, OLLAMA_MODEL, GEMINI_MODEL, OPENROUTER_MODEL, GIGACHAT_MODEL
 import logging
 import random
 random.seed(42)
@@ -227,12 +227,12 @@ def make_planner(planner_type: str, beacons: list[dict]):
 # ──────────────────────────── запуск ─────────────────────────────────────
 
 def main():
-    scenario_path = "scenarios/expedition.json"
+    scenario_path = "scenarios/mayor_support_ru.json"
     scenario = load_scenario(scenario_path)
     beacons = scenario["beacons"]
 
     planner_type = sys.argv[1] if len(sys.argv) > 1 else "dqn"
-    n_runs = int(sys.argv[2]) if len(sys.argv) > 2 else 20
+    n_runs = int(sys.argv[2]) if len(sys.argv) > 2 else 50
 
     planner = make_planner(planner_type, beacons)
 
@@ -247,6 +247,7 @@ def main():
     total_cons_total = 0
 
     for _ in range(n_runs):
+        print(_)
         res = run_single(scenario, planner, collect_scenes=True)
         all_paths.append(res["path"])
         all_intros.extend(res["scene_intros"])
@@ -308,6 +309,8 @@ def main():
         llm_name = f"gemini:{GEMINI_MODEL}"
     elif LLM_CLIENT == 'openrouter':
         llm_name = f"openrouter:{OPENROUTER_MODEL}"
+    elif LLM_CLIENT == 'gigachat':
+        llm_name = f"gigachat:{GIGACHAT_MODEL}"
     else:
         llm_name = LLM_CLIENT
 

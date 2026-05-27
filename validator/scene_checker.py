@@ -57,4 +57,13 @@ def validate_scene_json(scene: dict, beacon: dict) -> list[str]:
                             f"Use 'none' when narrative_effects is empty."
                         )
 
+                expected_count = len(valid_effects) if valid_effects else 1
+                actual_count = len(scene.get("player_options", []))
+                if actual_count != expected_count:
+                    effects_list_str = str(valid_effects) if valid_effects else '["none"]'
+                    errors.append(
+                        f"Expected {expected_count} player_option(s), but got {actual_count}. "
+                        f"Valid effects: {effects_list_str}"
+                    )
+
     return errors

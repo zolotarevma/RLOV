@@ -1,0 +1,198 @@
+{
+  "title": "Поддержка Мэра",
+  "description": "Убеди мэра профинансировать твою экспедицию. Его больная сестра и невыполненные поручения могут стать ключом.",
+  "initial_flags": {},
+  "beacons": [
+    {
+      "id": "village_start",
+      "type": "start",
+      "name": "Просьба Мэра",
+      "description": "Мэр Эдрик предлагает награду любому, кто избавит деревню от крыс, но тебе нужно его финансирование для великой экспедиции.",
+      "preconditions": {},
+      "effects": {"quest_received": true},
+      "narrative_effects": ["continue"],
+      "choices": ["info_gathering"]
+    },
+    {
+      "id": "info_gathering",
+      "type": "story",
+      "name": "Деревенская Таверна",
+      "description": "В таверне ты узнаёшь, что сестра мэра, Лиара, тяжело больна. У торговца может быть лекарство, а мэр дал несколько мелких поручений.",
+      "preconditions": {"quest_received": true},
+      "effects": {"learned_about_liara": true, "learned_about_errands": true},
+      "narrative_effects": ["chose_help_liara", "chose_errands", "chose_approach_mayor"],
+      "choices": ["help_liara", "do_errands", "approach_mayor"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "help_liara",
+      "type": "story",
+      "name": "Болезнь Сестры",
+      "description": "Ты решаешь помочь Лиаре. У торговца Вальдуса есть лекарство, но по высокой цене. Ты можешь уговорить его или украсть.",
+      "preconditions": {"learned_about_liara": true, "liara_saved": false},
+      "effects": {},
+      "narrative_effects": ["chose_pay_gold", "chose_steal_medicine"],
+      "choices": ["pay_gold", "steal_medicine"],
+      "expected_player_flag": "chose_help_liara"
+    },
+    {
+      "id": "pay_gold",
+      "type": "story",
+      "name": "Честная Сделка",
+      "description": "Ты платишь Вальдусу за лекарство. Он отдаёт его, желая Лиаре скорейшего выздоровления.",
+      "preconditions": {},
+      "effects": {"got_medicine": true, "paid_gold": true},
+      "narrative_effects": ["continue"],
+      "choices": ["give_medicine"],
+      "expected_player_flag": "chose_pay_gold"
+    },
+    {
+      "id": "steal_medicine",
+      "type": "story",
+      "name": "Рискованная Кража",
+      "description": "Тебе удаётся украсть лекарство, но Вальдус замечает тебя. Он грозится доложить мэру.",
+      "preconditions": {},
+      "effects": {"got_medicine": true, "angered_merchant": true},
+      "narrative_effects": ["continue"],
+      "choices": ["give_medicine"],
+      "expected_player_flag": "chose_steal_medicine"
+    },
+    {
+      "id": "give_medicine",
+      "type": "story",
+      "name": "Исцеление Лиары",
+      "description": "Ты даёшь лекарство Лиаре. Её щёки розовеют, и она горячо благодарит тебя.",
+      "preconditions": {"got_medicine": true},
+      "effects": {"liara_saved": true},
+      "narrative_effects": ["chose_approach_mayor", "chose_errands"],
+      "choices": ["approach_mayor", "do_errands"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "do_errands",
+      "type": "story",
+      "name": "Городские Поручения",
+      "description": "Ты решаешь помочь деревне, выполнив задания мэра. Нужно доставить письмо и очистить подвал от крыс.",
+      "preconditions": {"learned_about_errands": true,
+        "or": [{"letter_delivered": false}, {"rats_cleared": false}]},
+      "effects": {},
+      "narrative_effects": ["chose_deliver_letter", "chose_clear_rats"],
+      "choices": ["deliver_letter", "clear_rats"],
+      "expected_player_flag": "chose_errands"
+    },
+    {
+      "id": "deliver_letter",
+      "type": "story",
+      "name": "Доставка Письма",
+      "description": "Ты доставляешь важное письмо в соседнюю деревню. Получатель благодарен.",
+      "preconditions": {"letter_delivered": false},
+      "effects": {"letter_delivered": true},
+      "narrative_effects": ["continue"],
+      "choices": ["after_errand"],
+      "expected_player_flag": "chose_deliver_letter"
+    },
+    {
+      "id": "clear_rats",
+      "type": "story",
+      "name": "Крысиная Проблема",
+      "description": "Ты спускаешься в подвал и уничтожаешь крыс, портящих припасы деревни.",
+      "preconditions": {"rats_cleared": false},
+      "effects": {"rats_cleared": true},
+      "narrative_effects": ["continue"],
+      "choices": ["after_errand"],
+      "expected_player_flag": "chose_clear_rats"
+    },
+    {
+      "id": "after_errand",
+      "type": "story",
+      "name": "Работа Выполнена?",
+      "description": "Закончив одно задание, ты размышляешь о следующем шаге. Можно завершить другое поручение или сразу пойти к мэру.",
+      "preconditions": {
+        "or": [
+          {"letter_delivered": true},
+          {"rats_cleared": true}
+        ]
+      },
+      "effects": {"errands_done": true},
+      "narrative_effects": ["chose_approach_mayor", "chose_errands", "chose_help_liara"],
+      "choices": ["approach_mayor", "do_errands", "help_liara"],
+      "expected_player_flag": "continue"
+    },
+    {
+      "id": "secret_ritual",
+      "type": "story",
+      "name": "The Hidden Ritual",
+      "description": "You stumble upon an ancient ritual site deep in the woods. The air thrums with forgotten magic.",
+      "preconditions": {"ritual_unlocked": true},
+      "effects": {"ritual_performed": true},
+      "narrative_effects": [],
+      "choices": ["mayor_refuse"]
+    },
+    {
+      "id": "haunted_tower",
+      "type": "story",
+      "name": "The Haunted Tower",
+      "description": "A crumbling tower looms on the hill, said to hold the spirit of a long-dead sorcerer.",
+      "preconditions": {"tower_unsealed": true},
+      "effects": {"tower_cleansed": true},
+      "narrative_effects": [],
+      "choices": ["mayor_refuse"]
+    },
+    {
+      "id": "approach_mayor",
+      "type": "story",
+      "name": "Последняя Аудиенция",
+      "description": "Ты идёшь к мэру Эдрику просить финансирования для экспедиции. Он пристально смотрит на тебя, оценивая, что ты сделал для него и деревни.",
+      "preconditions": {"learned_about_liara": true, "learned_about_errands": true},
+      "effects": {"approached_mayor": true},
+      "narrative_effects": [],
+      "choices": ["full_support", "partial_support", "mayor_refuse"],
+      "expected_player_flag": "chose_approach_mayor"
+    },
+    {
+      "id": "full_support",
+      "type": "ending",
+      "name": "Щедрый Покровитель",
+      "description": "Впечатлённый твоими делами, мэр выделяет полное финансирование и припасы для экспедиции. Деревня запомнит твой героизм.",
+      "preconditions": {
+        "approached_mayor": true,
+        "liara_saved": true,
+        "errands_done": true,
+        "angered_merchant": false
+      },
+      "effects": {"ending_full_support": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "partial_support",
+      "type": "ending",
+      "name": "Скромный Вклад",
+      "description": "Мэр ценит твою помощь, но этого недостаточно для полного финансирования, или твоя репутация пострадала. Он даёт лишь половину.",
+      "preconditions": {
+        "approached_mayor": true,
+        "or": [
+          {"liara_saved": true},
+          {"errands_done": true}
+        ]
+      },
+      "effects": {"ending_partial_support": true},
+      "narrative_effects": [],
+      "choices": []
+    },
+    {
+      "id": "mayor_refuse",
+      "type": "ending",
+      "name": "Суровый Отказ",
+      "description": "Мэр насмехается над твоей просьбой. Ты ничего не сделал ни для него, ни для деревни. Он приказывает тебе уйти.",
+      "preconditions": {
+        "approached_mayor": true,
+        "liara_saved": false,
+        "errands_done": false
+      },
+      "effects": {"ending_refused": true},
+      "narrative_effects": [],
+      "choices": []
+    }
+  ]
+}
