@@ -52,9 +52,26 @@ python experiments/run_experiment.py dqn 20
 python experiments/compare_planners.py 30
 ```
 
-## Scenario
+## Pre-trained RL Models
 
-The project uses the nonlinear scenario «Mayor's Support» (`experiments/scenarios/mayor_support.json`) with 16 beacons and three endings.
+The `.backups` folder contains pre-trained models for two scenarios:
+- `dqn_model_mayor.pt` / `flags_order_mayor.json` – for the "Mayor's Support" scenario (mayor_support.json)
+- `dqn_model_expedition.pt` / `flags_order_expedition.json` – for the "Expedition" scenario (expedition.json)
+
+To use a pre-trained model, copy the required pair to the project root and rename them:
+```bash
+cp .backups/dqn_model_mayor.pt dqn_model.pt
+cp .backups/flags_order_mayor.json flags_order.json
+```
+
+## Scenarios
+
+The project includes two non-linear scenarios:
+
+- **Mayor's Support** (`experiments/scenarios/mayor_support.json`) – the main scenario used in the thesis, with 16 beacons and 3 endings.
+- **Expedition to the Forgotten Temple** (`experiments/scenarios/expedition.json`) – a more complex scenario with multiple macro-choice points for the RL agent, used in advanced experiments.
+
+Both scenarios are available in English and Russian (`*_ru.json`).
 
 ## Author
 
