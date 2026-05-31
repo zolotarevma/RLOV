@@ -5,7 +5,7 @@ A hybrid system for generating adaptive storylines in turn-based quest/RPG video
 ## Core Components
 
 - **RL Planner** (DQN) — learnable macro-management of narrative beacons.
-- **LLM Generator** — creates scenes and dialogues using large language models (local Ollama, Gemini, OpenRouter).
+- **LLM Generator** — creates scenes and dialogues using large language models (local Ollama, Gemini, OpenRouter, GigaChat).
 - **Validation Module** — formal graph verification and JSON response checking for LLM output.
 
 ## Installation
@@ -22,6 +22,7 @@ For cloud-based LLMs, set the following environment variables:
 
 - `OPENROUTER_API_KEY` — OpenRouter API key (https://openrouter.ai/keys)
 - `GEMINI_API_KEY` — Google AI Studio API key (https://makersuite.google.com/app/apikey)
+- `GIGACHAT_AUTHORIZATION_KEY` – GigaChat authorization key ([GigaChat API dashboard](https://developers.sber.ru/studio))
 
 Local models run via [Ollama](https://ollama.com).
 
@@ -29,7 +30,7 @@ Local models run via [Ollama](https://ollama.com).
 
 All parameters are in `config.py`:
 
-- `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"` or `"openrouter"`
+- `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"`, `"openrouter"` or `gigachat`
 - `OLLAMA_MODEL` — model name (e.g., `"llama3.1:8b"`)
 - `PLANNER` — `"heuristic"` or `"dqn"`
 
