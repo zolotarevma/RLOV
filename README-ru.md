@@ -31,8 +31,10 @@ pip install -r requirements.txt
 Следующие параметры задаются в `config.py`:
 
 - `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"`, `"openrouter"` или `gigachat`
+- `LANGUAGE` — `"en"` или `"ru"` (язык генерации сцен)
 - `OLLAMA_MODEL` — название модели (например, `"llama3.1:8b"`)
 - `PLANNER` — `"heuristic"` или `"dqn"`
+- `GIGACHAT_MODEL` — модель GigaChat (по умолчанию `"GigaChat-2"`)
 
 ## Запуск
 
