@@ -5,7 +5,7 @@
 ## Основные компоненты
 
 - **RL-планировщик** (DQN) — обучаемое макроуправление нарративными вехами.
-- **LLM-генератор** — создание сцен и диалогов с помощью больших языковых моделей (локальные Ollama, Gemini, OpenRouter).
+- **LLM-генератор** — создание сцен и диалогов с помощью больших языковых моделей (локальные Ollama, Gemini, OpenRouter, GigaChat).
 - **Модуль валидации** — формальный контроль графа сценария и проверка JSON-ответов LLM.
 
 ## Установка
@@ -22,6 +22,7 @@ pip install -r requirements.txt
 
 - `OPENROUTER_API_KEY` — ключ API OpenRouter (https://openrouter.ai/keys)
 - `GEMINI_API_KEY` — ключ Google AI Studio (https://makersuite.google.com/app/apikey)
+- `GIGACHAT_AUTHORIZATION_KEY` — ключ авторизации GigaChat ([личный кабинет GigaChat API](https://developers.sber.ru/studio))
 
 Локальные модели запускаются через [Ollama](https://ollama.com).
 
@@ -29,7 +30,7 @@ pip install -r requirements.txt
 
 Следующие параметры задаются в `config.py`:
 
-- `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"` или `"openrouter"`
+- `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"`, `"openrouter"` или `gigachat`
 - `OLLAMA_MODEL` — название модели (например, `"llama3.1:8b"`)
 - `PLANNER` — `"heuristic"` или `"dqn"`
 
