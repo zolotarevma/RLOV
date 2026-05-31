@@ -24,8 +24,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")  # получите ключ в
 # GigaChat
 GIGACHAT_TOKEN = os.getenv("GIGACHAT_TOKEN", "")
 GIGACHAT_MODEL = "GigaChat-2"
-GIGACHAT_TEMPERATURE = 0.2
-GIGACHAT_MAX_TOKENS = 5000
+GIGACHAT_TEMPERATURE = 0.3
+GIGACHAT_MAX_TOKENS = 2000
 GIGACHAT_AUTHORIZATION_KEY = os.getenv("GIGACHAT_AUTHORIZATION_KEY", "")  # получите ключ авторизации в Sber Developer Studio
 
 # Язык генерации: "en" или "ru"

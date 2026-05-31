@@ -44,6 +44,16 @@ def generate_scene(beacon: dict, state: dict) -> dict:
             time.sleep(RETRY_DELAY)
             continue
 
+        # Исправление лишних опций, когда narrative_effects пуст
+        if not beacon.get("narrative_effects") and len(scene.get("player_options", [])) > 1:
+            # Ищем опцию с effect "none"
+            none_opts = [opt for opt in scene["player_options"] if isinstance(opt, dict) and opt.get("effect") == "none"]
+            if none_opts:
+                scene["player_options"] = [none_opts[0]]
+            else:
+                # Если нет, берём первую
+                scene["player_options"] = [scene["player_options"][0]]
+
         errors = validate_scene_json(scene, beacon)
         if not errors:
             scene["_rejections"] = rejections

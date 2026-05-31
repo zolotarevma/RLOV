@@ -2,7 +2,7 @@ numpy==1.26.4
 requests
 google-generativeai==0.8.3
 gymnasium
-torch
+torch==2.12.0
 google
 openai
 scikit-learn
@@ -13,4 +13,5 @@ matplotlib
 seaborn
 jupyter
 pathlib
-urllib3
+urllib3==2.7.0
+streamlit

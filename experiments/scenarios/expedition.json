@@ -50,7 +50,7 @@
       "id": "quest_received_beacon",
       "type": "story",
       "name": "The Keeper's Blessing",
-      "description": "The Keeper entrusts you with the mission to retrieve the Orb of Ages from the Forgotten Temple.",
+      "description": "The Keeper entrusts you with the mission to retrieve the Orb of Ages from the Forgotten Temple. You decide to go to the town tavern before traveling.",
       "preconditions": {},
       "effects": {"quest_received": true},
       "narrative_effects": ["continue"],

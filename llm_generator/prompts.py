@@ -10,9 +10,9 @@ SYSTEM_PROMPT = (
     "- If the prompt says 'No narrative effects are needed' or the list is empty, you MUST generate exactly ONE "
     "player_option with 'effect' set to the literal string 'none' (lowercase)."
     "Do NOT invent any other effect names.\n"
-    "Note: Each effect is a technical flag that determines the next scene."
+    "Note: Each effect is a technical flag that determines the next scene.\n"
+    "- NEVER change the symbols in the names of effects, including underscores. For example, writing 'help_merchant' is correct, but 'helpmerchant' or 'help merchant' is incorrect.\n"
     "Do not create additional choices beyond those corresponding to valid effects.\n\n"
-    "Respond ONLY with a valid JSON object:\n"
     "Respond ONLY with a valid JSON object:\n"
     '{"intro": "...", "dialogues": [{"speaker": "Name", "text": "..."}], '
     '"player_options": [{"text": "...", "effect": "..."}], "outcome": "..."}'
@@ -27,7 +27,8 @@ SYSTEM_PROMPT_RU = (
     "- Если в промпте сказано 'No narrative effects are needed' или список пуст, ты ДОЛЖЕН сгенерировать РОВНО ОДИН "
     "player_option с 'effect', равным строке 'none' (нижний регистр)."
     "Не придумывай других эффектов.\n"
-    "Пояснение: каждый эффект является техническим флагом, определяющим следующую сцену."
+    "Пояснение: каждый эффект является техническим флагом, определяющим следующую сцену.\n"
+    "- НИКОГДА не изменяй символы в названиях эффектов, включая нижнее подчёркивание. Например, пиши 'help_merchant' - правильно, а 'helpmerchant' или 'help merchant' - это неправильно.\n"
     "Не придумывай дополнительных действий, не указанных в списке эффектов.\n\n"
     "Ответь ТОЛЬКО валидным JSON-объектом:\n"
     '{"intro": "...", "dialogues": [{"speaker": "Имя", "text": "..."}], '
