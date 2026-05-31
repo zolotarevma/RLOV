@@ -31,8 +31,10 @@ Local models run via [Ollama](https://ollama.com).
 All parameters are in `config.py`:
 
 - `LLM_CLIENT` — `"stub"`, `"ollama"`, `"gemini"`, `"openrouter"` or `gigachat`
+- `LANGUAGE` – `"en"` or `"ru"` (scene generation language)
 - `OLLAMA_MODEL` — model name (e.g., `"llama3.1:8b"`)
 - `PLANNER` — `"heuristic"` or `"dqn"`
+- `GIGACHAT_MODEL` – GigaChat model (default `"GigaChat-2"`)
 
 ## Usage
 
